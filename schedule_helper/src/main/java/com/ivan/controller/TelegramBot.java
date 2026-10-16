@@ -31,7 +31,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (userText.equals("/start")) {
                 response.setText("Привіт! Я твій бот. Скоро тут буде розклад пар.");
             } else if (userText.equals("Погода")) {
-                response.setText("Тут буде логіка для погоди.");
+                String weatherData = weatherService.getWeatherForToday();
+                response.setText(weatherData);
             } else {
                 response.setText("Ти написав: " + userText);
             }
