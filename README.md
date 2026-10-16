@@ -1,2 +1,2 @@
-# sheldue_helper
-This app provide scadual of my lesonss and provide wether information if asked.
+# schedule_helper
+This app provides my class schedule and weather information upon request.
