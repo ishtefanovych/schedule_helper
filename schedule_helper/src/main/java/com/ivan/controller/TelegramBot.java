@@ -1,5 +1,5 @@
 package com.ivan.controller;
-
+import com.ivan.service.WeatherService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
-
+    private WeatherService weatherService = new WeatherService();
     public TelegramBot() {
         super("8955208299:AAGRKATkPOPaOq3B31AUedNdrUN3hpEV1f4");
     }
@@ -17,6 +17,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public String getBotUsername() {
         return "ShtefanScheduleBot";
     }
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -29,9 +30,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             SendMessage response = new SendMessage();
             response.setChatId(String.valueOf(chatId));
             if (userText.equals("/start")) {
-                response.setText("Привіт! Я твій бот. Скоро тут буде розклад пар.");
+                response.setText("Привіт! Я твій бот, якщо тебе цікавить темепратура в Києві просто напиши \"Погода\" ");
             } else if (userText.equals("Погода")) {
-                String weatherData = weatherService.getWeatherForToday();
+                String weatherData = weatherService.getWeather();
                 response.setText(weatherData);
             } else {
                 response.setText("Ти написав: " + userText);
