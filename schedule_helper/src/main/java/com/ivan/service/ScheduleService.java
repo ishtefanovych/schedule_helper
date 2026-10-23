@@ -7,6 +7,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
+import java.util.List;
 
 @Service
 public class ScheduleService {
@@ -21,17 +23,22 @@ public class ScheduleService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response);
 
-            JsonNode firstWeek = root.path("scheduleFirstWeek");
-
-            DayOfWeek today = LocalDate.now().getDayOfWeek();
+            LocalDate currentDate = LocalDate.now();
+            DayOfWeek today = currentDate.getDayOfWeek();
             String targetDay = getUkrainianDayName(today);
 
-            if (targetDay.equals("Нд") || targetDay.equals("Сб") || targetDay.equals("Пт")) {
-                return "Сьогодні вихідний! Пар немає! 🎉";
+            if (List.of("Нд").contains(targetDay)) {
+                return "Сьогодні неділя";
             }
 
+            int weekOfYear = currentDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+            String weekNodeName = (weekOfYear % 2 != 0) ? "scheduleFirstWeek" : "scheduleSecondWeek";
+            String weekPrintName = (weekOfYear % 2 != 0) ? "Перший тиждень" : "Другий тиждень";
+
+            JsonNode targetWeek = root.path(weekNodeName);
+
             JsonNode todaySchedule = null;
-            for (JsonNode dayNode : firstWeek) {
+            for (JsonNode dayNode : targetWeek) {
                 if (dayNode.path("day").asText().equals(targetDay)) {
                     todaySchedule = dayNode;
                     break;
@@ -44,7 +51,7 @@ public class ScheduleService {
 
             JsonNode pairs = todaySchedule.path("pairs");
             StringBuilder result = new StringBuilder();
-            result.append("Розклад на сьогодні (").append(targetDay).append(", Перший тиждень):\n\n");
+            result.append(" Розклад на сьогодні (").append(targetDay).append(", ").append(weekPrintName).append("):\n\n");
 
             String lastTime = "";
             for (JsonNode pair : pairs) {
@@ -56,12 +63,12 @@ public class ScheduleService {
                 String shortTime = time.substring(0, 5);
 
                 if (!time.equals(lastTime)) {
-                    result.append("🕒 <b>").append(shortTime).append("</b>\n");
+                    result.append(" <b>").append(shortTime).append("</b>\n");
                     lastTime = time;
                 }
 
-                result.append(" ├ 📚 ").append(name).append(" (").append(type).append(")\n")
-                        .append(" └ 👨‍🏫 ").append(lecturer).append("\n\n");
+                result.append(" ├  ").append(name).append(" (").append(type).append(")\n")
+                        .append(" └  ").append(lecturer).append("\n\n");
             }
 
             return result.toString();
