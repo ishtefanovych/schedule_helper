@@ -1,6 +1,7 @@
 package com.ivan.controller;
 import com.ivan.service.ScheduleService;
 import com.ivan.service.WeatherService;
+import com.ivan.util.KeyboardUtils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -44,6 +45,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 response.setText("Ти написав: " + userText);
             }
 
+            KeyboardUtils.attachMainMenu(response);
+
+            // Відправляємо повідомлення в межах захищеного блоку
             try {
                 execute(response);
             } catch (TelegramApiException e) {
