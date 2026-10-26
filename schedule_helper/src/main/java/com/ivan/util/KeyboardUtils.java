@@ -9,25 +9,23 @@ import java.util.List;
 
 public class KeyboardUtils {
 
-    // Метод static дозволяє викликати його без створення об'єкта класу
     public static void attachMainMenu(SendMessage message) {
-        // Створюємо головний об'єкт клавіатури
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true); // Робить кнопки за розміром тексту, а не на пів екрана
-        keyboardMarkup.setOneTimeKeyboard(false); // Клавіатура не буде ховатися після натискання
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(false);
 
-        // Створюємо список, який буде тримати всі наші рядки кнопок
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        // Створюємо перший рядок кнопок
-        KeyboardRow row = new KeyboardRow();
-        row.add("Розклад");
-        row.add("Погода");
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Розклад на сьогодні");
+        row1.add("Розклад на завтра");
 
-        // Додаємо рядок до клавіатури
-        keyboard.add(row);
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Погода");
 
-        // Зберігаємо структуру та прикріплюємо до повідомлення
+        keyboard.add(row1);
+        keyboard.add(row2);
+
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
     }

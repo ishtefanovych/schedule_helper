@@ -1,4 +1,5 @@
 package com.ivan.controller;
+
 import com.ivan.service.ScheduleService;
 import com.ivan.service.WeatherService;
 import com.ivan.util.KeyboardUtils;
@@ -12,6 +13,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class TelegramBot extends TelegramLongPollingBot {
     private WeatherService weatherService = new WeatherService();
     private ScheduleService scheduleService = new ScheduleService();
+
     public TelegramBot() {
         super("8955208299:AAGRKATkPOPaOq3B31AUedNdrUN3hpEV1f4");
     }
@@ -20,7 +22,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     public String getBotUsername() {
         return "ShtefanScheduleBot";
     }
-
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -33,22 +34,24 @@ public class TelegramBot extends TelegramLongPollingBot {
             SendMessage response = new SendMessage();
             response.setParseMode("HTML");
             response.setChatId(String.valueOf(chatId));
+
             if (userText.equals("/start")) {
                 response.setText("Привіт! Я твій бот, якщо тебе цікавить темепратура в Києві просто напиши \"Погода\", а якщо тебе цікавить розклад просто напиши \"Розклад\" ");
-            } else if (userText.equals("Погода")) {
+            } else if (userText.equalsIgnoreCase("погода")) {
                 String weatherData = weatherService.getWeather();
                 response.setText(weatherData);
-            }else if (userText.equalsIgnoreCase("розклад") || userText.equals("/schedule")) {
-                String scheduleData = scheduleService.getSchedule();
+            } else if (userText.equalsIgnoreCase("розклад на сьогодні") || userText.equalsIgnoreCase("розклад")) {
+                String scheduleData = scheduleService.getTodaySchedule();
                 response.setText(scheduleData);
-            }
-            else {
+            } else if (userText.equalsIgnoreCase("розклад на завтра")) {
+                String scheduleData = scheduleService.getTomorrowSchedule();
+                response.setText(scheduleData);
+            } else {
                 response.setText("Ти написав: " + userText);
             }
 
             KeyboardUtils.attachMainMenu(response);
 
-            // Відправляємо повідомлення в межах захищеного блоку
             try {
                 execute(response);
             } catch (TelegramApiException e) {

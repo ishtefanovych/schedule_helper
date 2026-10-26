@@ -15,7 +15,15 @@ public class ScheduleService {
 
     private final String SCHEDULE_URL = "https://api.campus.kpi.ua/schedule/lessons?groupId=4351";
 
-    public String getSchedule() {
+    public String getTodaySchedule() {
+        return fetchSchedule(LocalDate.now(), "сьогодні");
+    }
+
+    public String getTomorrowSchedule() {
+        return fetchSchedule(LocalDate.now().plusDays(1), "завтра");
+    }
+
+    private String fetchSchedule(LocalDate targetDate, String dayLabel) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String response = restTemplate.getForObject(SCHEDULE_URL, String.class);
@@ -23,35 +31,34 @@ public class ScheduleService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response);
 
-            LocalDate currentDate = LocalDate.now();
-            DayOfWeek today = currentDate.getDayOfWeek();
-            String targetDay = getUkrainianDayName(today);
+            DayOfWeek targetDayOfWeek = targetDate.getDayOfWeek();
+            String targetDayName = getUkrainianDayName(targetDayOfWeek);
 
-            if (List.of("Нд").contains(targetDay)) {
-                return "Сьогодні неділя! Пар немає, можна відпочивати! 🎉";
+            if (List.of("Нд").contains(targetDayName)) {
+                return "На " + dayLabel + " (" + targetDayName + ") пар немає, можна відпочивати! 🎉";
             }
 
-            int weekOfYear = currentDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+            int weekOfYear = targetDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             String weekNodeName = (weekOfYear % 2 != 0) ? "scheduleFirstWeek" : "scheduleSecondWeek";
             String weekPrintName = (weekOfYear % 2 != 0) ? "Перший тиждень" : "Другий тиждень";
 
             JsonNode targetWeek = root.path(weekNodeName);
 
-            JsonNode todaySchedule = null;
+            JsonNode daySchedule = null;
             for (JsonNode dayNode : targetWeek) {
-                if (dayNode.path("day").asText().equals(targetDay)) {
-                    todaySchedule = dayNode;
+                if (dayNode.path("day").asText().equals(targetDayName)) {
+                    daySchedule = dayNode;
                     break;
                 }
             }
 
-            if (todaySchedule == null || todaySchedule.path("pairs").isEmpty()) {
-                return "На " + targetDay + " пар немає! Вихідний! 🎉";
+            if (daySchedule == null || daySchedule.path("pairs").isEmpty()) {
+                return "На " + dayLabel + " (" + targetDayName + ") пар немає! Вихідний! 🎉";
             }
 
-            JsonNode pairs = todaySchedule.path("pairs");
+            JsonNode pairs = daySchedule.path("pairs");
             StringBuilder result = new StringBuilder();
-            result.append("📅 Розклад на сьогодні (").append(targetDay).append(", ").append(weekPrintName).append("):\n\n");
+            result.append("📅 Розклад на ").append(dayLabel).append(" (").append(targetDayName).append(", ").append(weekPrintName).append("):\n\n");
 
             String lastTime = "";
             for (JsonNode pair : pairs) {
@@ -79,7 +86,7 @@ public class ScheduleService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "❌ Помилка під час отримання розкладу.";
+            return "Помилка";
         }
     }
 
@@ -94,6 +101,7 @@ public class ScheduleService {
             case SUNDAY -> "Нд";
         };
     }
+
     private String getPairName(String time) {
         if (time.startsWith("08:30")) return "Перша пара";
         if (time.startsWith("10:25")) return "Друга пара";
@@ -101,6 +109,6 @@ public class ScheduleService {
         if (time.startsWith("14:15")) return "Четверта пара";
         if (time.startsWith("16:10")) return "П'ята пара";
         if (time.startsWith("18:05")) return "Шоста пара";
-        return "Пара"; // Стандартне значення, якщо час інший
+        return "Пара";
     }
 }
