@@ -31,6 +31,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             long chatId = update.getMessage().getChatId();
 
             SendMessage response = new SendMessage();
+            response.setParseMode("HTML");
             response.setChatId(String.valueOf(chatId));
             if (userText.equals("/start")) {
                 response.setText("Привіт! Я твій бот, якщо тебе цікавить темепратура в Києві просто напиши \"Погода\", а якщо тебе цікавить розклад просто напиши \"Розклад\" ");

@@ -28,7 +28,7 @@ public class ScheduleService {
             String targetDay = getUkrainianDayName(today);
 
             if (List.of("Нд").contains(targetDay)) {
-                return "Сьогодні неділя";
+                return "Сьогодні неділя! Пар немає, можна відпочивати! 🎉";
             }
 
             int weekOfYear = currentDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
@@ -46,12 +46,12 @@ public class ScheduleService {
             }
 
             if (todaySchedule == null || todaySchedule.path("pairs").isEmpty()) {
-                return "На " + targetDay + " пар немає";
+                return "На " + targetDay + " пар немає! Вихідний! 🎉";
             }
 
             JsonNode pairs = todaySchedule.path("pairs");
             StringBuilder result = new StringBuilder();
-            result.append(" Розклад на сьогодні (").append(targetDay).append(", ").append(weekPrintName).append("):\n\n");
+            result.append("📅 Розклад на сьогодні (").append(targetDay).append(", ").append(weekPrintName).append("):\n\n");
 
             String lastTime = "";
             for (JsonNode pair : pairs) {
@@ -63,19 +63,23 @@ public class ScheduleService {
                 String shortTime = time.substring(0, 5);
 
                 if (!time.equals(lastTime)) {
-                    result.append(" <b>").append(shortTime).append("</b>\n");
+                    if (!lastTime.isEmpty()) {
+                        result.append("──────────────────────────\n");
+                    }
+                    String pairName = getPairName(shortTime);
+                    result.append("🕒 <b>").append(pairName).append(" (").append(shortTime).append(")</b>\n");
                     lastTime = time;
                 }
 
-                result.append(" ├  ").append(name).append(" (").append(type).append(")\n")
-                        .append(" └  ").append(lecturer).append("\n\n");
+                result.append(" ├ 📚 ").append(name).append(" (").append(type).append(")\n")
+                        .append(" └ 👨‍🏫 ").append(lecturer).append("\n\n");
             }
 
             return result.toString();
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Помилка";
+            return "❌ Помилка під час отримання розкладу.";
         }
     }
 
@@ -89,5 +93,14 @@ public class ScheduleService {
             case SATURDAY -> "Сб";
             case SUNDAY -> "Нд";
         };
+    }
+    private String getPairName(String time) {
+        if (time.startsWith("08:30")) return "Перша пара";
+        if (time.startsWith("10:25")) return "Друга пара";
+        if (time.startsWith("12:20")) return "Третя пара";
+        if (time.startsWith("14:15")) return "Четверта пара";
+        if (time.startsWith("16:10")) return "П'ята пара";
+        if (time.startsWith("18:05")) return "Шоста пара";
+        return "Пара"; // Стандартне значення, якщо час інший
     }
 }
