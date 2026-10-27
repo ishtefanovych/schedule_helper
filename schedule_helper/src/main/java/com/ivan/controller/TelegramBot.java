@@ -51,7 +51,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
 
             KeyboardUtils.attachMainMenu(response);
-
             try {
                 execute(response);
             } catch (TelegramApiException e) {

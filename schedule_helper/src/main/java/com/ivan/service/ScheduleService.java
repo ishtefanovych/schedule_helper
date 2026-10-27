@@ -35,7 +35,7 @@ public class ScheduleService {
             String targetDayName = getUkrainianDayName(targetDayOfWeek);
 
             if (List.of("Нд").contains(targetDayName)) {
-                return "На " + dayLabel + " (" + targetDayName + ") пар немає, можна відпочивати! 🎉";
+                return "На " + dayLabel + " (" + targetDayName + ") пар немає";
             }
 
             int weekOfYear = targetDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
@@ -66,7 +66,6 @@ public class ScheduleService {
                 String name = pair.path("name").asText();
                 String type = pair.path("type").asText();
                 String lecturer = pair.path("lecturer").path("name").asText();
-
                 String shortTime = time.substring(0, 5);
 
                 if (!time.equals(lastTime)) {
