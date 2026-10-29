@@ -1,5 +1,5 @@
 package com.ivan.controller;
-
+import org.springframework.beans.factory.annotation.Value;
 import com.ivan.service.ScheduleService;
 import com.ivan.service.WeatherService;
 import com.ivan.util.KeyboardUtils;
@@ -14,8 +14,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private WeatherService weatherService = new WeatherService();
     private ScheduleService scheduleService = new ScheduleService();
 
-    public TelegramBot() {
-        super("8955208299:AAGRKATkPOPaOq3B31AUedNdrUN3hpEV1f4");
+    public TelegramBot(@Value("${telegram.bot.token}") String botToken) {
+        super(botToken);
     }
 
     @Override

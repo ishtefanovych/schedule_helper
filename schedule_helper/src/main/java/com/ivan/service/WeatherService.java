@@ -1,5 +1,5 @@
 package com.ivan.service;
-
+import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -8,7 +8,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class WeatherService {
 
-    private final String API_KEY = "84ea33bfb51407a29f0182cc19398b2b";
+    @Value("${weather.api.key}")
+    private String API_KEY;
     private final String CITY = "Kyiv";
 
     public String getWeather() {
