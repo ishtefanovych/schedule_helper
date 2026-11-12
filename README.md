@@ -47,6 +47,42 @@ Set your bot token in `TelegramBot.java` and your OpenWeatherMap key in `Weather
 
 To get the bot up and running, simply launch the application and open the bot in Telegram by its handle, **@ShtefanScheduleBot**.
 
+Run with Docker:
+-------------------
+
+1. Create a `.env` file in the repository root (do not commit it):
+
+```
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+WEATHER_API_KEY=your_openweathermap_key
+```
+
+2. Build the image:
+
+```
+docker build -t schedule-helper .
+```
+
+3. Start the container:
+
+```
+docker run -d --name schedule-bot --restart unless-stopped --env-file .env schedule-helper
+```
+
+4. Check the logs:
+
+```
+docker logs -f schedule-bot
+```
+
+Stop / start / remove the container:
+
+```
+docker stop schedule-bot
+docker start schedule-bot
+docker rm -f schedule-bot
+```
+
 ### Future plans:
 -------------------
 
